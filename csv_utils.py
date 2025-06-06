@@ -65,3 +65,36 @@ def sort_rows(file_path, column_name, descending=False):
     except Exception as e:
         print(f"error sorting CSV: {e}")
         return []
+
+
+def aggregate_column(file_path, column_name, operation):
+    #performing aggregation on a numeric column - supported operation: sum, avg, min, max
+    values = []
+
+    try:
+        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                try:
+                    val = float(row[column_name])
+                    values.append(val)
+                except (ValueError, KeyError):
+                    continue
+
+        if not values:
+            return f"No valid numeric values found in column '{column_name}'"
+
+        operation = operation.lower()
+        if operation == "sum":
+            return sum(values)
+        elif operation == "avg":
+            return sum(values) / len(values)
+        elif operation == "min":
+            return min(values)
+        elif operation == "max":
+            return max(values)
+        else:
+            return f"unsupported operation: {operation}"
+
+    except Exception as e:
+        return f"error aggregating data: {e}"
