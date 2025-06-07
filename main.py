@@ -1,4 +1,4 @@
-from csv_utils import read_and_display_csv, filter_rows, sort_rows, aggregate_column
+from csv_utils import read_and_display_csv, filter_rows, sort_rows, aggregate_column, count_special_palindromes
 
 if __name__ == "__main__":
     file_path = "data/fruits_sales_data.csv"
@@ -37,4 +37,11 @@ if __name__ == "__main__":
 
     print("\n Aggregate: maximum of  Quantity")
     print("Result:", aggregate_column(file_path, "Quantity", "max"))
+
+
+
+    print("\ncounting special palindromes (A, D, V, B, N only)")
+    palindromes, total = count_special_palindromes(file_path)
+    print(f"found {total} palindrome(s): {sorted(palindromes)}")
+
 

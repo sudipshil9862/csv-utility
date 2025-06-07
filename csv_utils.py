@@ -98,3 +98,34 @@ def aggregate_column(file_path, column_name, operation):
 
     except Exception as e:
         return f"error aggregating data: {e}"
+
+
+def is_special_palindrome(value):
+    #checking if the value is a palindrome and uses only A, D, V, B, N
+    valid_chars = set("ADVBN")
+    value = value.upper()
+
+    if not value.isalpha():
+        return False
+    if value != value[::-1]:
+        return False
+    return all(char in valid_chars for char in value)
+
+def count_special_palindromes(file_path):
+    #returning a list of such palindromes and their count
+    count = 0
+    matches = set()
+
+    try:
+        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                for value in row.values():
+                    if isinstance(value, str) and is_special_palindrome(value.strip()):
+                        matches.add(value.strip().upper())
+                        count += 1
+        return matches, count
+    except Exception as e:
+        print(f"error counting palindromes: {e}")
+        return set(), 0
+
