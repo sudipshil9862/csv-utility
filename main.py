@@ -1,10 +1,23 @@
 from csv_utils import read_and_display_csv, filter_rows, sort_rows, aggregate_column, count_special_palindromes
+import argparse
+import os
 
 if __name__ == "__main__":
-    file_path = "data/fruits_sales_data.csv"
+    parser = argparse.ArgumentParser(description="CSV File Utility Tool")
+    parser.add_argument("file", help="Path to the input CSV file")
+    args = parser.parse_args()
 
-    print("\n Showing first 3 rows:")
-    read_and_display_csv(file_path)
+    file_path = args.file
+    if not os.path.exists(file_path):
+        print(f"file not found: {file_path}")
+        exit(1)
+
+    try:
+        num_to_show = int(input("Enter how many rows you want to see (max 30): "))
+    except ValueError:
+        print("invalid input. Must be an integer.")
+        exit(1)
+    read_and_display_csv(file_path, num_to_show)
 
     print("\n Filter: Quantity > 10")
     filtered = filter_rows(file_path, "Quantity", ">", "10")

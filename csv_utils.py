@@ -1,19 +1,29 @@
 import csv
 
-def read_and_display_csv(file_path, num_rows=3):
+def read_and_display_csv(file_path, num_rows):
     try:
         with open(file_path, mode='r', newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            print(f"\n--- Showing first {num_rows} rows from: {file_path} ---\n")
-            for i, row in enumerate(reader):
-                if i >= num_rows:
-                    break
-                print(row)
-    except FileNotFoundError:
-        print(f"file not found: {file_path}")
-    except Exception as e:
-        print(f"error reading CSV: {e}")
+            all_rows = list(reader)
+            total_rows = len(all_rows)
 
+            print(f"\nTotal rows available (excluding header): {total_rows}")
+
+            if num_rows > 30 and total_rows > 30:
+                print("Cannot display more than 30 rows from this file. It contains more than 30 rows.")
+                return
+
+            if num_rows > total_rows:
+                print(f"Only {total_rows} rows are available in the file. Showing all available rows...\n")
+                num_rows = total_rows
+
+            print(f"\n--- Displaying first {num_rows} row(s) ---\n")
+            for i in range(num_rows):
+                print(all_rows[i])
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"Error reading CSV: {e}")
 
 def filter_rows(file_path, column_name, condition, value):
     result = []
