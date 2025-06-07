@@ -25,39 +25,29 @@ def read_and_display_csv(file_path, num_rows):
     except Exception as e:
         print(f"Error reading CSV: {e}")
 
-def filter_rows(file_path, column_name, condition, value):
+def filter_rows(rows, column_name, condition, value):
     result = []
+    for row in rows:
+        cell_value = row.get(column_name)
+        if cell_value is None:
+            continue
+
+        if condition == "contains":
+            if value.lower() in cell_value.lower():
+                result.append(row)
+        else:
+            try:
+                cell_value_num = float(cell_value)
+                value_num = float(value)
+                if eval(f"{cell_value_num} {condition} {value_num}"):
+                    result.append(row)
+            except ValueError:
+                continue
+    return result
+
+
+def sort_rows(rows, column_name, descending=False):
     try:
-        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                cell_value = row.get(column_name)
-                if cell_value is None:
-                    continue
-
-                if condition == "contains":
-                    if value.lower() in cell_value.lower():
-                        result.append(row)
-                else:
-                    try:
-                        cell_value_num = float(cell_value)
-                        value_num = float(value)
-                        if eval(f"{cell_value_num} {condition} {value_num}"):
-                            result.append(row)
-                    except ValueError:
-                        continue
-        return result
-    except Exception as e:
-        print(f"error filtering CSV: {e}")
-        return []
-
-
-def sort_rows(file_path, column_name, descending=False):
-    try:
-        with open(file_path, mode='r', newline='', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            rows = list(reader)
-
         try:
             sorted_rows = sorted(
                 rows,
@@ -70,11 +60,11 @@ def sort_rows(file_path, column_name, descending=False):
                 key=lambda x: x[column_name].lower() if x[column_name] else "",
                 reverse=descending
             )
-
         return sorted_rows
     except Exception as e:
-        print(f"error sorting CSV: {e}")
+        print(f"Error sorting rows: {e}")
         return []
+
 
 
 def aggregate_column(file_path, column_name, operation):
@@ -139,3 +129,20 @@ def count_special_palindromes(file_path):
         print(f"error counting palindromes: {e}")
         return set(), 0
 
+
+def write_to_csv(output_path, rows, headers=None):
+    if not rows:
+        print("No data to write.")
+        return
+
+    if headers is None:
+        headers = rows[0].keys()
+
+    try:
+        with open(output_path, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(rows)
+        print(f"Data written to {output_path}")
+    except Exception as e:
+        print(f"Failed to write file: {e}")

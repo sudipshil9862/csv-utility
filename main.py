@@ -1,60 +1,64 @@
-from csv_utils import read_and_display_csv, filter_rows, sort_rows, aggregate_column, count_special_palindromes
 import argparse
 import os
+from csv_utils import (
+    read_and_display_csv, filter_rows, sort_rows,
+    aggregate_column, count_special_palindromes, write_to_csv
+)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CSV File Utility Tool")
+
     parser.add_argument("file", help="Path to the input CSV file")
+
+    #CLI flags
+    parser.add_argument("-n", "--preview", type=int, help="Show N rows (max 30)")
+    parser.add_argument("-f", "--filter", nargs=3, metavar=('column', 'operator', 'value'),
+                        help="Filter rows. Example: -f Quantity > 10")
+    parser.add_argument("-s", "--sort", metavar="column", help="Sort rows by column")
+    parser.add_argument("--desc", action="store_true", help="Sort descending")
+    parser.add_argument("-a", "--aggregate", nargs=2, metavar=("column", "operation"),
+                        help="Aggregate column with operation: sum, avg, min, max")
+    parser.add_argument("--palindrome", action="store_true", help="Count special palindromes")
+    parser.add_argument("-o", "--output", help="Write result to a new CSV file")
+
     args = parser.parse_args()
 
     file_path = args.file
     if not os.path.exists(file_path):
-        print(f"file not found: {file_path}")
+        print(f"File not found: {file_path}")
         exit(1)
 
-    try:
-        num_to_show = int(input("Enter how many rows you want to see (max 30): "))
-    except ValueError:
-        print("invalid input. Must be an integer.")
-        exit(1)
-    read_and_display_csv(file_path, num_to_show)
+    if args.preview is not None:
+        read_and_display_csv(file_path, args.preview)
 
-    print("\n Filter: Quantity > 10")
-    filtered = filter_rows(file_path, "Quantity", ">", "10")
-    for row in filtered:
-        print(row)
+    from csv import DictReader
+    with open(file_path, newline='', encoding='utf-8') as f:
+        reader = DictReader(f)
+        rows = list(reader)
 
-    print("\n Filter: Product contains 'Apple'")
-    filtered = filter_rows(file_path, "Product", "contains", "Apple")
-    for row in filtered:
-        print(row)
+    if args.filter:
+        col, op, val = args.filter
+        rows = filter_rows(rows, col, op, val)
 
-    print("\n Sort by Price (ascending):")
-    sorted_data = sort_rows(file_path, "Price")
-    for row in sorted_data[:3]:  # Display only top 3
-        print(row)
+    if args.sort:
+        rows = sort_rows(rows, args.sort, descending=args.desc)
 
-    print("\n Sort by Quantity (descending):")
-    sorted_data = sort_rows(file_path, "Quantity", descending=True)
-    for row in sorted_data[:3]:
-        print(row)
+    if args.aggregate:
+        col, op = args.aggregate
+        result = aggregate_column(file_path, col, op)
+        print(f"\nAggregation result for '{col}' ({op}): {result}")
 
-    print("\n Aggregate: Sum of Quantity")
-    print("Result:", aggregate_column(file_path, "Quantity", "sum"))
+    if args.palindrome:
+        palindromes, total = count_special_palindromes(file_path)
+        print(f"\nFound {total} special palindrome(s): {sorted(palindromes)}")
 
-    print("\n Aggregate: Avarage of Price")
-    print("Result:", aggregate_column(file_path, "Price", "avg"))
-
-    print("\n Aggregate: minimum of Price")
-    print("Result:", aggregate_column(file_path, "Price", "min"))
-
-    print("\n Aggregate: maximum of  Quantity")
-    print("Result:", aggregate_column(file_path, "Quantity", "max"))
-
-
-
-    print("\ncounting special palindromes (A, D, V, B, N only)")
-    palindromes, total = count_special_palindromes(file_path)
-    print(f"found {total} palindrome(s): {sorted(palindromes)}")
-
-
+    if args.output:
+        write_to_csv(args.output, rows)
+    elif args.filter or args.sort:
+        print("\nFinal result:")
+        for row in rows:
+            print(row)
+    elif not (args.preview or args.aggregate or args.palindrome):
+        print("\nFinal result:")
+        for row in rows:
+            print(row)
