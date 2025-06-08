@@ -31,26 +31,26 @@ python3 main.py <csv_file_path> [options]
 ## Example Commands
 Show top 5 rows:
 ```
-python3 main.py data/fruits_sales_data.csv -n 5
+./csv-utility data/fruits_sales_data.csv -n 5
 ```
 
 Filter and sort:
 ```
-python3 main.py data/fruits_sales_data.csv -f Quantity ">" 5 -s Price --desc
+./csv-utility data/fruits_sales_data.csv -f Quantity ">" 5 -s Price --desc
 ```
 
 Aggregate and save to a new file:
 ```
-python3 main.py data/fruits_sales_data.csv -a Quantity sum -o result/output.csv
+./csv-utility data/fruits_sales_data.csv -a Quantity sum -o result/output.csv
 ```
 
 Check for palindromes:
 ```
-python3 main.py data/fruits_sales_data.csv --palindrome
+./csv-utility data/fruits_sales_data.csv --palindrome
 ```
 multiple argparse simultaneously is possible:
 ```
-python3 main.py data/fruits_sales_data.csv   -n 5   -f Quantity ">" 5   -s Pricew --desc   -a Quantity sum   --palindrome   -o result/full_output.csv
+./csv-utility data/fruits_sales_data.csv   -n 5   -f Quantity ">" 5   -s Pricew --desc   -a Quantity sum   --palindrome   -o result/full_output.csv
 ```
 
 ## Running Test cases
