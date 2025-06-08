@@ -35,16 +35,30 @@ if __name__ == "__main__":
     with open(file_path, newline='', encoding='utf-8') as f:
         reader = DictReader(f)
         rows = list(reader)
+        if not rows and not (args.aggregate or args.palindrome):
+            print(f"The file '{file_path}' contains no data rows to display.")
+            exit(0)
+
+    headers = rows[0].keys() if rows else []
 
     if args.filter:
         col, op, val = args.filter
         rows = filter_rows(rows, col, op, val)
+        if col not in headers:
+            print(f"\nInvalid column for filtering: '{col}' \nAvailable columns: {', '.join(headers)}")
+            exit(1)
 
     if args.sort:
+        if args.sort not in headers:
+            print(f"\nInvalid column for sorting: '{args.sort}' \nAvailable columns: {', '.join(headers)}")
+            exit(1)
         rows = sort_rows(rows, args.sort, descending=args.desc)
 
     if args.aggregate:
         col, op = args.aggregate
+        if col not in headers:
+            print(f"\nInvalid column for aggregation: '{col}' \nAvailable columns: {', '.join(headers)}")
+            exit(1)
         result = aggregate_column(file_path, col, op)
         print(f"\nAggregation result for '{col}' ({op}): {result}")
 
