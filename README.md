@@ -16,7 +16,7 @@ This is a command-line utility built in Python that performs various operations 
 Run the utility using:
 
 ```
-python3 main.py <csv_file_path> [options]
+./csv-utility <csv_file_path> [options]
 ```
 ## Options
 
